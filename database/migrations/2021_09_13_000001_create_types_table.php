@@ -7,20 +7,15 @@ use Illuminate\Support\Facades\Schema;
 return new class() extends Migration {
     public function up(): void
     {
-        if (config("aaa.upstream") !== null) {
-            return;
-        }
         Schema::create('aaa_types', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('parent_id')->nullable();
+            $table->json('meta')->nullable();
+            $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        if (config("aaa.upstream") !== null) {
-            return;
-        }
         Schema::dropIfExists('aaa_types');
     }
 };

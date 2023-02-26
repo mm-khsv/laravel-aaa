@@ -4,22 +4,27 @@ namespace dnj\AAA\Contracts;
 
 interface IType extends IHasAbilities
 {
-    public function getID(): int;
+    public function getId(): int;
 
     public function getLocalizedDetails(string $lang): ?ITypeLocalizedDetails;
 
     /**
-     * @return iterable<string>
+     * @return string[]
      */
-    public function getAbilities(): iterable;
+    public function getAbilities(): array;
 
     /**
-     * @return iterable<int[>
+     * @return int[]
      */
-    public function getChildrenIds(): iterable;
+    public function getChildIds(): array;
 
     /**
-     * @return iterable<IType>
+     * @return int[]
      */
-    public function getChildren(): iterable;
+    public function getParentIds(): array;
+
+    /**
+     * @return array<mixed,mixed>
+     */
+    public function getMeta(): array;
 }

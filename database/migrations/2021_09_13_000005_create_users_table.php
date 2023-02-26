@@ -1,5 +1,6 @@
 <?php
 
+use dnj\AAA\Contracts\UserStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -10,15 +11,18 @@ return new class() extends Migration {
         Schema::create('aaa_users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->foreignId('type_id');
-            $table->tinyInteger('status');
 
-            $table->index(['status']);
-            if (config("aaa.upstream") === null) {
-                $table->foreign('type_id')
-                    ->references('id')
-                    ->on('aaa_types');
-            }
+            $table->foreignId('type_id')
+                ->references('id')
+                ->on('aaa_types')
+                ->cascadeOnDelete();
+
+            $table->enum('status', array_column(UserStatus::cases(), 'value'))
+                ->index();
+
+            $table->json('meta')->nullable();
+
+            $table->timestamps();
         });
     }
 

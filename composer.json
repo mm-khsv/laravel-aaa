@@ -1,21 +1,22 @@
 {
-	"name": "dnj/aaa",
+	"name": "dnj/laravel-aaa",
 	"license": "MIT",
 	"minimum-stability": "dev",
 	"prefer-stable": true,
 	"require": {
 		"php": "^8.1",
-		"laravel/framework": "^9",
-		"laravel/passport": "^11.2"
+		"dnj/laravel-user-logger": "@dev"
 	},
 	"require-dev": {
 		"phpunit/phpunit": "^9.5",
 		"phpstan/phpstan": "^1.4.1",
-		"friendsofphp/php-cs-fixer": "^3.1"
+		"friendsofphp/php-cs-fixer": "^3.11",
+		"orchestra/testbench": "^7.0"
 	},
 	"autoload": {
 		"psr-4": {
-			"dnj\\AAA\\": "src/"
+			"dnj\\AAA\\": "src/",
+			"dnj\\AAA\\Database\\Factories\\": "database/factories/"
 		}
 	},
 	"autoload-dev": {
@@ -36,7 +37,7 @@
 	"extra": {
 		"laravel": {
 			"providers": [
-				"dnj\\AAA\\AAAServiceProvider"
+				"dnj\\AAA\\ServiceProvider"
 			]
 		}
 	}

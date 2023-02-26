@@ -1,90 +1,120 @@
 <?php
+
 namespace dnj\AAA;
 
-use dnj\AAA\Contracts\IUser;
 use dnj\AAA\Contracts\IOwnerableModel;
-use dnj\AAA\Contracts\InvalidArgumentException;
-use Illuminate\Database\Eloquent\Model;
+use dnj\AAA\Contracts\ITypeManager;
+use dnj\AAA\Contracts\IUser;
+use dnj\AAA\Contracts\IUserManager;
+use dnj\AAA\Models\User;
 use Illuminate\Auth\Access\Response;
+use Illuminate\Database\Eloquent\Model;
 
 abstract class Policy
 {
-    public function __construct()
+    public static function getModelAbilityName(Model|string $model, string $method): string
     {
-        //
+        if ($model instanceof Model) {
+            $model = get_class($model);
+        }
+
+        return "{$model}@{$method}";
     }
 
-    public function __call(string $method, array $arguments)
+    public function __call(string $method, array $arguments): Response
     {
         return $this->accessProcessor(
-            $method,
+            $this->getAbilityName($method),
             $this->getUserFromArgs($arguments),
-            $this->getModelFromArgs($arguments)
+            $this->getModelFromArgs($arguments),
         );
     }
 
-    protected function accessProcessor(string $ability, ?IUser $user, ?Model $model): ?Response
+    abstract public function getModel(): string;
+
+    public function getAbilityName(string $method): string
     {
-        if (!$user or !$model) {
-            return null;
+        return self::getModelAbilityName($this->getModel(), $method);
+    }
+
+    protected function accessProcessor(string $ability, ?IUser $user, ?Model $model): Response
+    {
+        if (!$user) {
+            /**
+             * @var ITypeManager
+             */
+            $typeManager = app(ITypeManager::class);
+            $guest = $typeManager->getGuestType();
+            if ($guest and $guest->can($ability)) {
+                return Response::allow();
+            }
+
+            return $this->denyResponse($ability);
         }
-        if (!$user->can($ability)) {
-            return $this->denyResponseWhenUserCant($ability, $user);  
+        if ($user->cant($ability)) {
+            return $this->denyResponseWhenUserCant($ability);
         }
-        if ($this->userHasAccessToModel($user, $model)) {
-            return $this->allowResponse($ability, $user, $model);
-        } else {
-            return $this->denyResponse($ability, $user, $model);
+        if (null === $model) {
+            return Response::allow();
         }
 
-        return null;
+        return $this->userHasAccessToModel($user, $model) ? Response::allow() : $this->denyResponse($ability);
     }
 
     protected function userHasAccessToModel(IUser $user, Model $model): ?bool
     {
-        $ownerUser = $model->getOwnerUser();
-        if (!$ownerUser) {
+        if (!$model instanceof IOwnerableModel) {
             return null;
         }
-        if ($user->getID() == $ownerUser->getID()) {
+        $ownerId = $model->getOwnerUserId();
+        if (null === $ownerId) {
+            return null;
+        }
+        if ($user->getId() == $ownerId) {
             return true;
         }
+        if ($user instanceof User) {
+            /**
+             * @var IType
+             */
+            $type = $user->type;
+        } else {
+            /**
+             * @var ITypeManager
+             */
+            $typeManager = app(ITypeManager::class);
+            $type = $typeManager->findOrFail($user->getTypeId());
+        }
 
-        return $user->getType()->getChildrenIds()->contains($ownerUser->getTypeId());
+        /**
+         * @var IUserManager
+         */
+        $userManager = app(IUserManager::class);
+        $owner = $userManager->findOrFail($ownerId);
+
+        return in_array($owner->getTypeId(), $type->getChildIds());
     }
 
-    protected function allowResponse(string $ability, IUser $user, Model $model): Response
-    {
-        return Response::allow(
-            sprintf("Congratulation '%s', you has access to '%s' ability on: %s", $user->getName(), $ability, $model->__toString())
-        );
-    }
-
-    protected function denyResponse(string $ability, IUser $user, Model $model): Response
+    protected function denyResponse(string $ability): Response
     {
         return Response::denyAsNotFound(
-            sprintf("Sorry '%s', You has no access to ability '%s'", $user->getName(), $ability)
+            sprintf("Sorry, You has no access to ability '%s'", $ability)
         );
     }
 
-    protected function denyResponseWhenUserCant(string $ability, IUser $user): Response
+    protected function denyResponseWhenUserCant(string $ability): Response
     {
-        return Response::denyWithStatus(403, sprintf("Sorry '%s', You has no access to ability '%s'", $user->getName(), $ability));
+        return Response::denyWithStatus(403, sprintf("Sorry You has no access to ability '%s'", $ability));
     }
 
     private function getUserFromArgs(array $arguments): ?IUser
     {
-        $index = 0;
-        if (!isset($arguments[$index]) or !$arguments[$index]) {
-            return null;
-        }
-        if (!$arguments[$index] instanceof IUser) {
-            throw new InvalidArgumentException(
-                sprintf('The argument #%s should be instance of %s but %s given!', $index + 1, IUser::class, get_class($arguments[$index]))
-            );
+        $user = $arguments[0] ?? null;
+        if (null !== $user and !$user instanceof IUser) {
+            throw new \InvalidArgumentException(sprintf('The argument #1 should be instance of %s but %s given!', IUser::class, get_class($user)));
         }
 
-        return $arguments[$index];
+        return $user;
     }
 
     private function getModelFromArgs(array $arguments): ?Model
@@ -94,15 +124,10 @@ abstract class Policy
             return null;
         }
         if (!is_object($arguments[$index])) {
-            throw new InvalidArgumentException(sprintf('The argument #%s should be object, but %s given!', $index + 1, gettype($arguments[$index])));
+            throw new \InvalidArgumentException(sprintf('The argument #%s should be object, but %s given!', $index + 1, gettype($arguments[$index])));
         }
         if (!$arguments[$index] instanceof Model) {
-            throw new InvalidArgumentException(
-                sprintf('The argument #%s should be instance of %s but %s given!', $index + 1, Model::class, get_class($arguments[$index]))
-            );
-        }
-        if (!$arguments[$index] instanceof IOwnerableModel) {
-            throw new InvalidArgumentException(sprintf('The given model (%s) is not implemented the (%s) interface!', get_class($arguments[$index]), IOwnerableModel::class));
+            throw new \InvalidArgumentException(sprintf('The argument #%s should be instance of %s but %s given!', $index + 1, Model::class, get_class($arguments[$index])));
         }
 
         return $arguments[$index];

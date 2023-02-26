@@ -1,8 +1,10 @@
 <?php
+
 namespace dnj\AAA\Contracts;
 
-interface IOwnerableModel 
+interface IOwnerableModel
 {
-    public function getOwnerUser(): ?IUser;
+    public function getOwnerUserId(): ?int;
+
     public function getOwnerUserColumn(): string;
 }

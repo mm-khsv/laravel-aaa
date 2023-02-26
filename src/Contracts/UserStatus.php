@@ -2,8 +2,8 @@
 
 namespace dnj\AAA\Contracts;
 
-enum UserStatus: int
+enum UserStatus: string
 {
-    case ACTIVE = 1;
-    case SUSPEND = 2;
+    case ACTIVE = 'ACTIVE';
+    case SUSPEND = 'SUSPEND';
 }

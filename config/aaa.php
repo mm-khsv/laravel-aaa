@@ -1,6 +1,6 @@
 <?php
 
 return [
-	'guestType' => 2,
-	'abilities' => [],
+    'guestType' => 2,
+    'abilities' => [],
 ];

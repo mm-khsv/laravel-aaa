@@ -7,19 +7,19 @@ use Illuminate\Support\Facades\Schema;
 return new class() extends Migration {
     public function up(): void
     {
-        if (config("aaa.upstream") !== null) {
-            return;
-        }
         Schema::create('aaa_types_translates', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('type_id');
+
+            $table->foreignId('type_id')
+                ->references('id')
+                ->on('aaa_types')
+                ->cascadeOnDelete();
+
             $table->string('lang', 2);
             $table->string('title');
 
-            $table->foreign('type_id')
-                ->references('id')
-                ->on('aaa_types');
             $table->unique(['lang', 'type_id']);
+            $table->timestamps();
         });
     }
 

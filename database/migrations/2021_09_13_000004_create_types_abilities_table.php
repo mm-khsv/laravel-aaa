@@ -7,17 +7,15 @@ use Illuminate\Support\Facades\Schema;
 return new class() extends Migration {
     public function up(): void
     {
-        if (config("aaa.upstream") !== null) {
-            return;
-        }
         Schema::create('aaa_types_abilities', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('type_id');
-            $table->string('name');
 
-            $table->foreign('type_id')
+            $table->foreignId('type_id')
                 ->references('id')
-                ->on('aaa_types');
+                ->on('aaa_types')
+                ->cascadeOnDelete();
+
+            $table->string('name');
         });
     }
 

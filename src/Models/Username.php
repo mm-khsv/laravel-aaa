@@ -1,48 +1,39 @@
 <?php
 
-namespace dnj\AAA;
+namespace dnj\AAA\Models;
 
 use dnj\AAA\Contracts\IHasAbilities;
+use dnj\AAA\Contracts\IHasPassword;
 use dnj\AAA\Contracts\IUsername;
-use dnj\AAA\HasAbilities;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Hash;
+use dnj\AAA\Database\Factories\UsernameFactory;
+use dnj\AAA\Models\Concerns\HasAbilities;
+use dnj\UserLogger\Concerns\Loggable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Hash;
 
 /**
- * @property int $id
- * @property int $user_id
- * @property Contracts\IUser $user
+ * @property int    $id
+ * @property int    $user_id
+ * @property User   $user
  * @property string $username
  * @property string $password
  */
-class Username extends Model implements IUsername, IHasAbilities
+class Username extends Model implements IUsername, IHasAbilities, IHasPassword
 {
     use HasAbilities;
+    use Loggable;
+    use HasFactory;
 
-    /**
-     * The "booted" method of the model.
-     *
-     * @return void
-     */
-    protected static function booted()
+    public static function newFactory(): UsernameFactory
     {
-        static::creating(function ($username) {
-            $username->password = Hash::make($username->password);
-        });
+        return UsernameFactory::new();
     }
 
     /**
      * @var string
      */
     protected $table = 'aaa_users_usernames';
-
-    /**
-     * @var array<string,mixed>
-     */
-    protected $casts = [
-        // 'password' => 'encrypted',
-    ];
 
     protected $fillable = [
         'user_id',
@@ -52,14 +43,12 @@ class Username extends Model implements IUsername, IHasAbilities
 
     protected $hidden = ['password'];
 
-    public $timestamps = false;
-
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function getID(): int
+    public function getId(): int
     {
         return $this->id;
     }
@@ -85,9 +74,9 @@ class Username extends Model implements IUsername, IHasAbilities
     }
 
     /**
-     * @return Collection<string>
+     * @return string[]
      */
-    public function getAbilities(): Collection
+    public function getAbilities(): array
     {
         return $this->getUser()->getAbilities();
     }

@@ -1,0 +1,53 @@
+<?php
+
+namespace dnj\AAA;
+
+use dnj\AAA\Contracts\ITypeManager;
+use dnj\AAA\Contracts\IUserManager;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\ServiceProvider as SupportServiceProvider;
+
+class ServiceProvider extends SupportServiceProvider
+{
+    public function register()
+    {
+        $this->mergeConfigFrom(__DIR__.'/../config/aaa.php', 'aaa');
+        $this->app->singleton(ITypeManager::class, TypeManager::class);
+        $this->app->singleton(IUserManager::class, UserManager::class);
+        $this->app->singleton(GateHook::class);
+        $this->registerUserProvider();
+    }
+
+    public function boot()
+    {
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        $this->integrateToGates();
+        if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__.'/../config/aaa.php' => config_path('aaa.php'),
+            ], 'config');
+            $this->commands([
+                Console\PolicyMakeCommand::class,
+            ]);
+        }
+    }
+
+    protected function registerUserProvider(): void
+    {
+        /*
+         * @param \Illuminate\Auth\AuthManager $auth
+         */
+        Auth::resolved(function ($auth) {
+            $auth->provider('aaa', function ($app) {
+                return $app->make(UserProvider::class);
+            });
+        });
+    }
+
+    protected function integrateToGates(): void
+    {
+        $gateHook = $this->app->make(GateHook::class);
+        Gate::after(\Closure::fromCallable($gateHook));
+    }
+}

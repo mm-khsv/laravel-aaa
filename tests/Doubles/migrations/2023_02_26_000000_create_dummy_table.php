@@ -7,21 +7,19 @@ use Illuminate\Support\Facades\Schema;
 return new class() extends Migration {
     public function up(): void
     {
-        Schema::create('aaa_users_usernames', function (Blueprint $table) {
+        Schema::create('aaa_dummy', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')
+                ->nullable()
                 ->references('id')
                 ->on('aaa_users')
                 ->cascadeOnDelete();
-            $table->string('username')->unique();
-            $table->string('password', 255)->nullable();
-
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('aaa_users_usernames');
+        Schema::dropIfExists('aaa_dummy');
     }
 };
