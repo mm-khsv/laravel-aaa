@@ -2,7 +2,10 @@
 
 namespace dnj\AAA\Contracts;
 
-interface IUser extends IHasAbilities
+use Illuminate\Contracts\Auth\Access\Authorizable;
+use Illuminate\Contracts\Auth\Authenticatable;
+
+interface IUser extends IHasAbilities, Authenticatable, Authorizable
 {
     public function getId(): int;
 

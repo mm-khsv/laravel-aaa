@@ -4,8 +4,6 @@ namespace dnj\AAA\Contracts;
 
 interface IHasAbilities
 {
-    public function can(string $ability): bool;
-
     /**
      * @param string[] $abilities
      */
