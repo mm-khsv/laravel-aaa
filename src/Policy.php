@@ -8,13 +8,12 @@ use dnj\AAA\Contracts\IUser;
 use dnj\AAA\Contracts\IUserManager;
 use dnj\AAA\Models\User;
 use Illuminate\Auth\Access\Response;
-use Illuminate\Database\Eloquent\Model;
 
 abstract class Policy
 {
-    public static function getModelAbilityName(Model|string $model, string $method): string
+    public static function getModelAbilityName(object|string $model, string $method): string
     {
-        if ($model instanceof Model) {
+        if ($model instanceof object) {
             $model = get_class($model);
         }
 
@@ -37,7 +36,7 @@ abstract class Policy
         return self::getModelAbilityName($this->getModel(), $method);
     }
 
-    protected function accessProcessor(string $ability, ?IUser $user, ?Model $model): Response
+    protected function accessProcessor(string $ability, ?IUser $user, ?object $model): Response
     {
         if (!$user) {
             /**
@@ -61,7 +60,7 @@ abstract class Policy
         return $this->userHasAccessToModel($user, $model) ? Response::allow() : $this->denyResponse($ability);
     }
 
-    protected function userHasAccessToModel(IUser $user, Model $model): ?bool
+    protected function userHasAccessToModel(IUser $user, object $model): ?bool
     {
         if (!$model instanceof IOwnerableModel) {
             return null;
@@ -117,7 +116,7 @@ abstract class Policy
         return $user;
     }
 
-    private function getModelFromArgs(array $arguments): ?Model
+    private function getModelFromArgs(array $arguments): ?object
     {
         $index = 1;
         if (!isset($arguments[$index]) or !$arguments[$index]) {
@@ -126,8 +125,9 @@ abstract class Policy
         if (!is_object($arguments[$index])) {
             throw new \InvalidArgumentException(sprintf('The argument #%s should be object, but %s given!', $index + 1, gettype($arguments[$index])));
         }
-        if (!$arguments[$index] instanceof Model) {
-            throw new \InvalidArgumentException(sprintf('The argument #%s should be instance of %s but %s given!', $index + 1, Model::class, get_class($arguments[$index])));
+        $model = $this->getModel();
+        if (!is_subclass_of($arguments[$index], $model, true)) {
+            throw new \InvalidArgumentException(sprintf('The argument #%s should be instance of %s but %s given!', $index + 1, $model, get_class($arguments[$index])));
         }
 
         return $arguments[$index];
