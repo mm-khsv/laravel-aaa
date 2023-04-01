@@ -126,7 +126,7 @@ abstract class Policy
             throw new \InvalidArgumentException(sprintf('The argument #%s should be object, but %s given!', $index + 1, gettype($arguments[$index])));
         }
         $model = $this->getModel();
-        if (!is_subclass_of($arguments[$index], $model, true)) {
+        if (!is_a($arguments[$index], $model, true)) {
             throw new \InvalidArgumentException(sprintf('The argument #%s should be instance of %s but %s given!', $index + 1, $model, get_class($arguments[$index])));
         }
 

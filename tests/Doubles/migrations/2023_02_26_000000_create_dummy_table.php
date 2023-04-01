@@ -9,7 +9,7 @@ return new class() extends Migration {
     {
         Schema::create('aaa_dummy', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')
+            $table->foreignId('owner_id')
                 ->nullable()
                 ->references('id')
                 ->on('aaa_users')

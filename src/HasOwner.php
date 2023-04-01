@@ -18,7 +18,7 @@ trait HasOwner
         return $this->belongsTo(User::class);
     }
 
-    public function getOwnerUserId(): int
+    public function getOwnerUserId(): ?int
     {
         return $this->owner_id;
     }

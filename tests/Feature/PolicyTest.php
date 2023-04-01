@@ -46,13 +46,13 @@ class PolicyTest extends TestCase
 
         $this->assertTrue($policy->update($user)->allowed());
 
-        $dummy = DummyModel::query()->create(['user_id' => null]);
+        $dummy = DummyModel::query()->create(['owner_id' => null]);
         $this->assertFalse($policy->update($user, $dummy)->allowed());
 
-        $dummy = DummyModel::query()->create(['user_id' => $user->id]);
+        $dummy = DummyModel::query()->create(['owner_id' => $user->id]);
         $this->assertTrue($policy->update($user, $dummy)->allowed());
 
-        $dummy = DummyModel::query()->create(['user_id' => $subUser->id]);
+        $dummy = DummyModel::query()->create(['owner_id' => $subUser->id]);
         $this->assertTrue($policy->update($user, $dummy)->allowed());
     }
 }
