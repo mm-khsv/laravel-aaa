@@ -3,6 +3,8 @@
 namespace dnj\AAA\Models\Concerns;
 
 use Illuminate\Auth\Access\Response;
+use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Contracts\Auth\Authenticatable;
 
 trait HasAbilities
 {
@@ -12,6 +14,9 @@ trait HasAbilities
      */
     public function can($ability, $arguments = []): bool
     {
+        if (!empty($arguments) and $this instanceof Authenticatable) {
+            return app(Gate::class)->forUser($this)->check($ability, $arguments);
+        }
         if (is_iterable($ability)) {
             return $this->canAll(iterator_to_array($ability));
         }
