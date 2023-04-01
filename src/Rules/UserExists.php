@@ -20,7 +20,14 @@ class UserExists extends OwnerableModelExists
         }
 
         $model = $this->manager->find($value);
-        if (!$model or ($this->user and !$this->manager->isParentOf($this->user, $model))) {
+        if (
+            !$model or
+            (
+                $this->user and
+                $this->user->getId() != $model->getId() and
+                !$this->manager->isParentOf($this->user, $model)
+            )
+        ) {
             $fail('The :attribute is invalid');
         }
     }
