@@ -7,4 +7,6 @@ interface IOwnerableModel
     public function getOwnerUserId(): ?int;
 
     public function getOwnerUserColumn(): string;
+
+    public function hasUserAccess(IUser $user): bool;
 }
