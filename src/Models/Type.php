@@ -6,15 +6,18 @@ use dnj\AAA\Contracts\IType;
 use dnj\AAA\Database\Factories\TypeFactory;
 use dnj\AAA\Models\Concerns\HasAbilities;
 use dnj\UserLogger\Concerns\Loggable;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Support\Collection;
 
 /**
  * @property int                              $id
  * @property Collection<TypeLocalizedDetails> $translates
  * @property Collection<TypeAbility>          $abilities
+ * @property Collection<User>                 $users
+ * @property Collection<self>                 $children
+ * @property Collection<self>                 $parents
  * @property array<mixed,mixed>               $meta
  */
 class Type extends Model implements IType
@@ -26,6 +29,11 @@ class Type extends Model implements IType
     public static function newFactory(): TypeFactory
     {
         return TypeFactory::new();
+    }
+
+    public static function ensureId(int|IType $value): int
+    {
+        return $value instanceof IType ? $value->getId() : $value;
     }
 
     /**
@@ -174,5 +182,15 @@ class Type extends Model implements IType
         $this->children()->sync($childIds);
 
         return $this;
+    }
+
+    public function isParentOf(int|IType $other): bool
+    {
+        return $this->children->pluck('id')->contains(self::ensureId($other));
+    }
+
+    public function isChildOf(int|IType $other): bool
+    {
+        return $this->parents->pluck('id')->contains(self::ensureId($other));
     }
 }

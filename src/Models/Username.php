@@ -30,6 +30,11 @@ class Username extends Model implements IUsername, IHasAbilities, IHasPassword
         return UsernameFactory::new();
     }
 
+    public static function ensureId(int|IUsername $value): int
+    {
+        return $value instanceof IUsername ? $value->getId() : $value;
+    }
+
     /**
      * @var string
      */

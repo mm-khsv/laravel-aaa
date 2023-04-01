@@ -37,4 +37,8 @@ interface IUserManager
     public function update(int|IUser $user, array $changes, bool $userActivityLog = false): IUser;
 
     public function destroy(int|IUser $user, bool $userActivityLog = false): void;
+
+    public function isParentOf(int|IUser $user, int|IUser $other): bool;
+
+    public function isChildOf(int|IUser $user, int|IUser $other): bool;
 }

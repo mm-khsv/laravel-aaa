@@ -36,6 +36,11 @@ class User extends Model implements IUser, Authenticatable, Authorizable
         return UserFactory::new();
     }
 
+    public static function ensureId(int|IUser $value): int
+    {
+        return $value instanceof IUser ? $value->getId() : $value;
+    }
+
     protected ?Username $activeUsername = null;
 
     protected $casts = [

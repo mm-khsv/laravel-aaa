@@ -43,4 +43,8 @@ interface ITypeManager
     ): IType;
 
     public function destroy(int|IType $type, bool $userActivityLog = false): void;
+
+    public function isParentOf(int|IType $type, int|IType $other): bool;
+
+    public function isChildOf(int|IType $type, int|IType $other): bool;
 }

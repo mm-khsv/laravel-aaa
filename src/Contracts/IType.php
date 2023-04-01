@@ -27,4 +27,10 @@ interface IType extends IHasAbilities
      * @return array<mixed,mixed>
      */
     public function getMeta(): array;
+
+    public function can(string $ability): bool;
+
+    public function isParentOf(int|IType $other): bool;
+
+    public function isChildOf(int|IType $other): bool;
 }

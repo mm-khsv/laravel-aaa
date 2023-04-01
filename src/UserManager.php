@@ -141,4 +141,38 @@ class UserManager implements IUserManager
             }
         });
     }
+
+    public function isParentOf(int|IUser $user, int|IUser $other): bool
+    {
+        if (is_int($user)) {
+            $user = User::query()->findOrFail($user);
+        }
+        if (is_int($other)) {
+            $other = User::query()->findOrFail($other);
+        }
+
+        /*
+         * @var User $user
+         * @var User $other
+         */
+
+        return $user->type->isParentOf($other->type_id);
+    }
+
+    public function isChildOf(int|IUser $user, int|IUser $other): bool
+    {
+        if (is_int($user)) {
+            $user = User::query()->findOrFail($user);
+        }
+        if (is_int($other)) {
+            $other = User::query()->findOrFail($other);
+        }
+
+        /*
+         * @var User $user
+         * @var User $other
+         */
+
+        return $user->type->isChildOf($other->type_id);
+    }
 }

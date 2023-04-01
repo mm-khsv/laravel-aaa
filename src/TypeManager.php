@@ -158,4 +158,22 @@ class TypeManager implements ITypeManager
             }
         });
     }
+
+    public function isParentOf(int|IType $type, int|IType $other): bool
+    {
+        if (is_int($type)) {
+            $type = Type::query()->findOrFail($type);
+        }
+
+        return $type->isParentOf($other);
+    }
+
+    public function isChildOf(int|IType $type, int|IType $other): bool
+    {
+        if (is_int($type)) {
+            $type = Type::query()->findOrFail($type);
+        }
+
+        return $type->isChildOf($other);
+    }
 }
