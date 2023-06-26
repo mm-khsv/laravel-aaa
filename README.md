@@ -89,7 +89,11 @@ Each user may have some usernames, username can be anything, like: email, cellph
 ## aaa.php
 In this file, you can define the guest type, if user not exists in you app (or not logged in), the app will use this type for check permissions.
 define the ID of the guest type in `aaa.php` in `guestType` property.
-
+```php
+[
+    'guestType' => 2, // The id of guest type
+];
+```
 
 ## Policies
 Laravel-AAA provides support for [polices](https://laravel.com/docs/10.x/authorization#creating-policies)
@@ -173,6 +177,160 @@ class HomeController extends Controller
     }
 }
 
+```
+
+## Type Managment
+The `ITypeManager` interface provides methods for creating, updating, and deleting types, Here's an example of how to create a new type:
+
+```php
+use dnj\AAA\Contracts\ITypeManager;
+use dnj\AAA\Contracts\IType;
+
+
+class TypeController extends Controller
+{
+    private $typeManager;
+
+    public function __construct(ITypeManager $typeManager)
+    {
+        $this->typeManager = $typeManager;
+    }
+
+    public function createType()
+    {
+        // the name of this type in diffrent languages
+        $localizedDetails = [
+            'en' => ['title' => 'Admin'],
+            'fr' => ['title' => 'Administratrice'],
+            'nl' => ['title' => 'beheerder'],
+        ];
+
+        // abilities that we want to define for this type (user role)
+        $abilities = [
+            'add_post',
+            'edit_post',
+            'remove_post',
+            'publish_post',
+        ]
+
+        // the subtype IDs, consider this type as parent of other types, that means this type will have permission to another types
+        $childIds = [
+            // id
+        ];
+
+        // if you want to define any other data for this type, use this field
+        $meta = [
+            'notes' => 'Some notes about this type',
+        ];
+
+        // save log for this action
+        $userActivityLog = true;
+
+        $type = $this->typeManager->create($localizedDetails, $abilities, $childIds, $meta, $userActivityLog);
+    }
+
+    public function updateType(IType $type, array $update)
+    {
+        $changes = [];
+
+        if (isset($update['localizedDetails'])) {
+            $changes['localizedDetails'] = $update['localizedDetails'];
+        }
+        if (isset($update['abilities'])) {
+            $changes['abilities'] = $update['abilities'];
+        }
+        if (isset($update['childIds'])) {
+            $changes['childIds'] = $update['childIds'];
+        }
+        if (isset($update['meta'])) {
+            $changes['meta'] = $update['meta'];
+        }
+        // save log for this action
+        $userActivityLog = true;
+
+        $type = $this->typeManager->create($type, $changes, $userActivityLog);
+    }
+
+    public function deleteType(IType $type)
+    {
+        // save log for this action
+        $userActivityLog = true;
+
+        $this->typeManager->delete($type, $userActivityLog);
+    }
+}
+```
+
+
+## User Managment
+The `IUserManager` interface provides methods for creating, updating, and deleting users, Here's an example of how to create a new user:
+
+```php
+use dnj\AAA\Contracts\IUserManager;
+use dnj\AAA\Contracts\IUser;
+use dnj\AAA\Contracts\ITypeManager;
+use dnj\AAA\Contracts\IType;
+
+class UserController extends Controller
+{
+    private $userManager;
+
+    public function __construct(IUserManager $userManager)
+    {
+        $this->userManager = $userManager;
+    }
+
+    public function createUser()
+    {
+        // name of the user
+        $name = 'Hossein Hosni'
+
+        // username of the user
+        $username = 'hosni'; // or cellphone number, or any unique thing
+
+        // password of the user
+        $password = 'SomeStrongPassword@123';
+
+        // the id of the user, or the Type object
+        $type = 1;
+        // or create user as guest
+        $type = app(ITypeManager::class)->getGuestTypeID();
+
+        // if you want to define any other data for this user, use this field
+        $meta = [
+            'notes' => 'Some notes about this user',
+        ];
+
+        // save log for this action
+        $userActivityLog = true;
+
+        $user = $this->userManager->create($name, $username, $type, $meta, $userActivityLog);
+    }
+
+    public function updateUser(IUser $user, array $update)
+    {
+        $changes = [];
+
+        if (isset($update['type'])) {
+            $changes['type'] = $update['type'];
+        }
+        if (isset($update['usernames'])) {
+            $changes['usernames'] = $update['usernames'];
+        }
+        // save log for this action
+        $userActivityLog = true;
+
+        $user = $this->userManager->create($user, $changes, $userActivityLog);
+    }
+
+    public function deleteUser(IUser $user)
+    {
+        // save log for this action
+        $userActivityLog = true;
+
+        $this->userManager->delete($user, $userActivityLog);
+    }
+}
 ```
 
 
