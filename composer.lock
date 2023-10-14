@@ -4,15 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "012255c8bf8b1aa4634dd17908553052",
+    "content-hash": "a753cadfda9f81bc4d38b905e6e7b7ae",
     "packages": [
         {
             "name": "dnj/laravel-localization",
-            "version": "dev-main",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/dnj/laravel-localization.git",
+                "reference": "2db96a2291cf005795ccb0d47ce257e787896fa7"
+            },
             "dist": {
-                "type": "path",
-                "url": "../laravel-localization",
-                "reference": "76cc232855f126a7e1bd15c3b0d3a55321f2375c"
+                "type": "zip",
+                "url": "https://api.github.com/repos/dnj/laravel-localization/zipball/2db96a2291cf005795ccb0d47ce257e787896fa7",
+                "reference": "2db96a2291cf005795ccb0d47ce257e787896fa7",
+                "shasum": ""
             },
             "require": {
                 "php": "^8.1"
@@ -29,33 +35,15 @@
                     "dnj\\Localization\\": "src/"
                 }
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "dnj\\Localization\\Tests\\": "tests/"
-                }
-            },
-            "scripts": {
-                "test:types": [
-                    "vendor/bin/phpstan analyze"
-                ],
-                "test:phpunit": [
-                    "vendor/bin/phpunit"
-                ],
-                "test:codestyle": [
-                    "vendor/bin/php-cs-fixer fix -v --dry-run --stop-on-violation --using-cache=no"
-                ],
-                "test": [
-                    "@test:types",
-                    "@test:phpunit",
-                    "@test:codestyle"
-                ]
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
-            "transport-options": {
-                "relative": true
-            }
+            "support": {
+                "issues": "https://github.com/dnj/laravel-localization/issues",
+                "source": "https://github.com/dnj/laravel-localization/tree/v1.0.0"
+            },
+            "time": "2023-10-14T12:23:35+00:00"
         },
         {
             "name": "dnj/laravel-user-logger",
@@ -8912,10 +8900,7 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "dnj/laravel-user-logger": 20,
-        "dnj/laravel-localization": 20
-    },
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
