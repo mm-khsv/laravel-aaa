@@ -14,7 +14,7 @@ class GateHook
     {
     }
 
-    public function __invoke(?Authorizable $user = null, string $ability, Response|bool|null $response): Response|bool|null
+    public function __invoke(?Authorizable $user, string $ability, Response|bool|null $response): Response|bool|null
     {
         if (!is_null($response)) {
             return $response;
