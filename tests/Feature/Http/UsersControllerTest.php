@@ -37,7 +37,7 @@ class UsersControllerTest extends TestCase
         $unknownUser = User::factory()->create();
 
         $this->actingAs($me);
-        $response = $this->getJson(route('users.index'))->assertOk()->dd();
+        $response = $this->getJson(route('users.index'))->assertOk();
         $this->assertIsArray($response['data']);
         $this->assertCount(2, $response['data']);
         $this->assertEqualsCanonicalizing([$me->id, $myChild->id], array_column($response['data'], 'id'));
