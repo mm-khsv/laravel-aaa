@@ -4,7 +4,7 @@ namespace dnj\AAA\Tests\Feature;
 
 use dnj\AAA\Models\Type;
 use dnj\AAA\Models\TypeAbility;
-use dnj\AAA\Models\TypeLocalizedDetails;
+use dnj\AAA\Models\TypeTranslate;
 use dnj\AAA\Tests\TestCase;
 use Illuminate\Auth\Access\AuthorizationException;
 
@@ -14,15 +14,15 @@ class TypeManagerTest extends TestCase
     {
         $child = Type::factory()->create();
         $type = $this->getTypeManager()->store(
-            ['en' => ['title' => 'Admin']],
-            ['blog_post_add', 'blog_post_edit'],
-            [$child->getId()],
-            ['k1' => 'v1'],
-            true,
-            true,
+            translates: ['en' => ['title' => 'Admin']],
+            abilities: ['blog_post_add', 'blog_post_edit'],
+            childIds: [$child->getId()],
+            meta: ['k1' => 'v1'],
+            childToItself: true,
+            userActivityLog: true,
         );
         $this->assertDatabaseHas($type->getTable(), ['id' => $type->getId()]);
-        $this->assertSame('Admin', $type->getLocalizedDetails('en')->getTitle());
+        $this->assertSame('Admin', $type->getTranslate('en')->getTitle());
         $this->assertSame(['k1' => 'v1'], $type->getMeta());
         $this->assertSame(['blog_post_add', 'blog_post_edit'], $type->getAbilities());
         $this->assertEqualsCanonicalizing([$type->getId(), $child->getId()], $type->getChildIds());
@@ -41,15 +41,15 @@ class TypeManagerTest extends TestCase
     public function testUpdate(): void
     {
         $type = Type::factory()
-            ->has(TypeLocalizedDetails::factory()->withLang('en'), 'translates')
-            ->has(TypeLocalizedDetails::factory()->withLang('ar'), 'translates')
+            ->has(TypeTranslate::factory()->withLocale('en'), 'translates')
+            ->has(TypeTranslate::factory()->withLocale('ar'), 'translates')
             ->has(TypeAbility::factory(5), 'abilities')
             ->has(Type::factory(5), 'children')
             ->create();
         $newChild = Type::factory()->create();
 
         $changes = [
-            'localizedDetails' => [
+            'translates' => [
                 'it' => [
                     'title' => 'test-it',
                 ],
@@ -62,13 +62,13 @@ class TypeManagerTest extends TestCase
             'childIds' => array_merge(array_slice($type->getChildIds(), 2, 2), [$newChild->getId()]),
         ];
         $type = $this->getTypeManager()->update(
-            $type->getId(),
-            $changes,
-            true,
+            type: $type->getId(),
+            changes: $changes,
+            userActivityLog: true,
         );
-        $this->assertSame('test-en', $type->getLocalizedDetails('en')->getTitle());
-        $this->assertSame('test-it', $type->getLocalizedDetails('it')->getTitle());
-        $this->assertNull($type->getLocalizedDetails('ar'));
+        $this->assertSame('test-en', $type->getTranslate('en')->getTitle());
+        $this->assertSame('test-it', $type->getTranslate('it')->getTitle());
+        $this->assertNull($type->getTranslate('ar'));
         $this->assertEqualsCanonicalizing($changes['abilities'], $type->getAbilities());
         $this->assertSame($changes['meta'], $type->getMeta());
         $this->assertEqualsCanonicalizing($changes['childIds'], $type->getChildIds());

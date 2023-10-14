@@ -2,7 +2,9 @@
 
 namespace dnj\AAA\Models;
 
+use dnj\AAA\Contracts\ITypeManager;
 use dnj\AAA\Contracts\IUser;
+use dnj\AAA\Contracts\IUserManager;
 use dnj\AAA\Contracts\UserStatus;
 use dnj\AAA\Database\Factories\UserFactory;
 use dnj\AAA\Models\Concerns\HasAbilities;
@@ -10,6 +12,7 @@ use dnj\AAA\Models\Concerns\HasDynamicFields;
 use dnj\UserLogger\Concerns\Loggable;
 use Illuminate\Contracts\Auth\Access\Authorizable;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -59,6 +62,59 @@ class User extends Model implements IUser, Authenticatable, Authorizable
      * @var string
      */
     protected $table = 'aaa_users';
+
+    public function scopeFilter(Builder $query, array $filters): void
+    {
+        if (isset($filters['id'])) {
+            $query->where('id', $filters['id']);
+        }
+        if (isset($filters['name'])) {
+            $query->where('name', 'LIKE', $filters['name']);
+        }
+        if (isset($filters['type_id'])) {
+            $query->where('type_id', $filters['type_id']);
+        }
+        if (isset($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+        if (isset($filters['meta'])) {
+            foreach ($filters['meta'] as $key => $value) {
+                $query->where("meta->{$key}", $value);
+            }
+        }
+        if (isset($filters['userHasAccess'])) {
+            $this->scopeUserHasAccess($query, $filters['userHasAccess']);
+        }
+    }
+
+    public function scopeUserHasAccess(Builder $query, int|IUser $user): void
+    {
+        if (is_int($user)) {
+            /**
+             * @var IUserManager
+             */
+            $userManager = app(IUserManager::class);
+            $user = $userManager->findOrFail($user);
+        }
+        if (!$user instanceof self) {
+            throw new \Exception('This method just work with '.self::class);
+        }
+        /**
+         * @var ITypeManager
+         */
+        $typeManager = app(ITypeManager::class);
+        $type = $typeManager->findOrFail($user->getTypeId());
+        $childIds = $type->getChildIds();
+
+        if ($childIds) {
+            $query->where(function ($query) use ($user, $childIds) {
+                $query->whereIn('type_id', $childIds);
+                $query->orWhere('id', $user->getId());
+            });
+        } else {
+            $query->where('id', $user->getId());
+        }
+    }
 
     public function setActiveUsername(?Username $activeUsername): void
     {

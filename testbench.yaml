@@ -1,0 +1,3 @@
+providers:
+  - dnj\UserLogger\ServiceProvider
+  - dnj\AAA\ServiceProvider

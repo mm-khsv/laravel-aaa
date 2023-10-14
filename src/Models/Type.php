@@ -5,26 +5,32 @@ namespace dnj\AAA\Models;
 use dnj\AAA\Contracts\IType;
 use dnj\AAA\Database\Factories\TypeFactory;
 use dnj\AAA\Models\Concerns\HasAbilities;
+use dnj\Localization\Eloquent\HasTranslate;
 use dnj\UserLogger\Concerns\Loggable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
- * @property int                              $id
- * @property Collection<TypeLocalizedDetails> $translates
- * @property Collection<TypeAbility>          $abilities
- * @property Collection<User>                 $users
- * @property Collection<self>                 $children
- * @property Collection<self>                 $parents
- * @property array<mixed,mixed>               $meta
+ * @property int                       $id
+ * @property Collection<TypeTranslate> $translates
+ * @property Collection<TypeAbility>   $abilities
+ * @property Collection<User>          $users
+ * @property Collection<self>          $children
+ * @property Collection<self>          $parents
+ * @property array<mixed,mixed>        $meta
+ *
+ * @method ?TypeTranslate          getTranslate(string $locale)
+ * @method iterable<TypeTranslate> getTranslates()
  */
 class Type extends Model implements IType
 {
     use HasAbilities;
     use Loggable;
     use HasFactory;
+    use HasTranslate;
 
     public static function newFactory(): TypeFactory
     {
@@ -61,7 +67,7 @@ class Type extends Model implements IType
 
     public function translates()
     {
-        return $this->hasMany(TypeLocalizedDetails::class);
+        return $this->hasMany(TypeTranslate::class);
     }
 
     public function getId(): int
@@ -69,12 +75,26 @@ class Type extends Model implements IType
         return $this->id;
     }
 
-    public function getLocalizedDetails(string $lang): ?TypeLocalizedDetails
+    public function scopeFilter(Builder $query, array $filters): void
     {
-        return TypeLocalizedDetails::query()
-            ->where('lang', $lang)
-            ->where('type_id', $this->getId())
-            ->first();
+        if (isset($filters['id'])) {
+            if (is_array($filters['id'])) {
+                $query->whereIn('id', $filters['id']);
+            } else {
+                $query->where('id', $filters['id']);
+            }
+        }
+        if (isset($filters['hasFullAccess']) and $filters['hasFullAccess']) {
+            $this->scopeHasFullAccess($query);
+        }
+    }
+
+    public function scopeHasFullAccess(Builder $query): void
+    {
+        $typesCount = self::query()->count();
+        $abilitiesCount = TypeAbility::query()->toBase()->distinct()->count('name');
+        $query->has('abilities', $abilitiesCount);
+        $query->has('children', $typesCount);
     }
 
     /**
@@ -147,29 +167,6 @@ class Type extends Model implements IType
         if ($created) {
             $this->abilities()->createMany($created->map(fn (string $name) => ['name' => $name]));
         }
-
-        return $this;
-    }
-
-    /**
-     * @param array<string,array{title:string}> $localizedDetails
-     */
-    public function updateLocalizedDetails(array $localizedDetails): static
-    {
-        $translates = $this->translates;
-        $newLangs = array_keys($localizedDetails);
-
-        $translates->filter(fn (TypeLocalizedDetails $t) => !in_array($t->lang, $newLangs))->each(fn (TypeLocalizedDetails $t) => $t->delete());
-
-        $newTranslates = array_diff($newLangs, $translates->pluck('lang')->all());
-        if ($newTranslates) {
-            $newTranslates = $this->translates()->createMany(array_map(fn (string $lang) => [
-                'lang' => $lang,
-                ...$localizedDetails[$lang],
-            ], $newTranslates));
-        }
-
-        $translates->filter(fn (TypeLocalizedDetails $t) => isset($localizedDetails[$t->lang]))->each(fn (TypeLocalizedDetails $t) => $t->update($localizedDetails[$t->lang]));
 
         return $this;
     }

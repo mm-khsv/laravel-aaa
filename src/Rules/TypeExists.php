@@ -2,11 +2,11 @@
 
 namespace dnj\AAA\Rules;
 
-use dnj\AAA\Contracts\IUserManager;
+use dnj\AAA\Contracts\ITypeManager;
 
-class UserExists extends OwnerableModelExists
+class TypeExists extends OwnerableModelExists
 {
-    public function __construct(IUserManager $manager)
+    public function __construct(ITypeManager $manager)
     {
         parent::__construct($manager);
     }
@@ -20,14 +20,7 @@ class UserExists extends OwnerableModelExists
         }
 
         $model = $this->manager->find($value);
-        if (
-            !$model
-            or (
-                $this->user
-                and $this->user->getId() != $model->getId()
-                and !$this->manager->isParentOf($this->user, $model)
-            )
-        ) {
+        if (!$model) {
             $fail('The :attribute is invalid');
         }
     }

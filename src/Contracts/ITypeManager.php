@@ -9,7 +9,7 @@ interface ITypeManager
     public function findOrFail(int $id): IType;
 
     /**
-     * @param array{id?:int[],title?:string} $filters
+     * @param array{id?:int[],title?:string,hasFullAccess:bool} $filters
      *
      * @return iterable<IType>
      */
@@ -20,21 +20,22 @@ interface ITypeManager
     public function getGuestType(): ?IType;
 
     /**
-     * @param array<string,array{title:string}> $localizedDetails
+     * @param array<string,array{title:string}> $translates
      * @param string[]                          $abilities
      * @param int[]                             $childIds
      * @param array<mixed,mixed>                $meta
      */
     public function store(
-        array $localizedDetails,
+        array $translates,
         array $abilities = [],
         array $childIds = [],
         array $meta = [],
+        bool $childToItself = false,
         bool $userActivityLog = false,
     ): IType;
 
     /**
-     * @param array{localizedDetails?:array<string,array{title:string}>,abilities?:string[],childIds?:int[],meta?:array<mixed,mixed>} $changes
+     * @param array{translates?:array<string,array{title:string}>,abilities?:string[],childIds?:int[],meta?:array<mixed,mixed>} $changes
      */
     public function update(
         int|IType $type,
@@ -47,4 +48,9 @@ interface ITypeManager
     public function isParentOf(int|IType $type, int|IType $other): bool;
 
     public function isChildOf(int|IType $type, int|IType $other): bool;
+
+    /**
+     * @return string[]
+     */
+    public function getAllAbilities(): array;
 }

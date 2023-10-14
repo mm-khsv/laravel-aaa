@@ -3,13 +3,23 @@
 namespace dnj\AAA;
 
 use dnj\AAA\Contracts\ITypeManager;
+use dnj\AAA\Contracts\IUser;
 use dnj\AAA\Contracts\IUserManager;
+use dnj\AAA\Policies\UserPolicy;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider as SupportServiceProvider;
 
 class ServiceProvider extends SupportServiceProvider
 {
+    /**
+     * @var array<class-string,class-string>
+     */
+    protected $policies = [
+        IUser::class => UserPolicy::class,
+    ];
+
     public function register()
     {
         $this->mergeConfigFrom(__DIR__.'/../config/aaa.php', 'aaa');
@@ -23,6 +33,8 @@ class ServiceProvider extends SupportServiceProvider
     {
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         $this->integrateToGates();
+        $this->registerRoutes();
+        $this->registerPolicies();
         if ($this->app->runningInConsole()) {
             $this->publishes([
                 __DIR__.'/../config/aaa.php' => config_path('aaa.php'),
@@ -49,5 +61,23 @@ class ServiceProvider extends SupportServiceProvider
     {
         $gateHook = $this->app->make(GateHook::class);
         Gate::after(\Closure::fromCallable($gateHook));
+    }
+
+    protected function registerRoutes(): void
+    {
+        if (!config('aaa.routes.enable')) {
+            return;
+        }
+        $prefix = config('aaa.routes.prefix', 'api/users');
+        Route::prefix($prefix)->group(function () {
+            $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
+        });
+    }
+
+    protected function registerPolicies(): void
+    {
+        foreach ($this->policies as $model => $policy) {
+            Gate::policy($model, $policy);
+        }
     }
 }

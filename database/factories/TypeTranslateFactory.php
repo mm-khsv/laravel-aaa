@@ -3,15 +3,15 @@
 namespace dnj\AAA\Database\Factories;
 
 use dnj\AAA\Models\Type;
-use dnj\AAA\Models\TypeLocalizedDetails;
+use dnj\AAA\Models\TypeTranslate;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<TypeLocalizedDetails>
+ * @extends Factory<TypeTranslate>
  */
-class TypeLocalizedDetailsFactory extends Factory
+class TypeTranslateFactory extends Factory
 {
-    protected $model = TypeLocalizedDetails::class;
+    protected $model = TypeTranslate::class;
 
     public function definition()
     {
@@ -19,15 +19,15 @@ class TypeLocalizedDetailsFactory extends Factory
 
         return [
             'type_id' => Type::factory(),
-            'lang' => substr($locale, 0, 2),
+            'locale' => substr($locale, 0, 2),
             'title' => fake($locale)->words(2, true),
         ];
     }
 
-    public function withLang(string $lang): static
+    public function withLocale(string $locale): static
     {
         return $this->state(fn () => [
-            'lang' => $lang,
+            'locale' => $locale,
         ]);
     }
 

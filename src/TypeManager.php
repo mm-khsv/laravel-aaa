@@ -5,6 +5,7 @@ namespace dnj\AAA;
 use dnj\AAA\Contracts\IType;
 use dnj\AAA\Contracts\ITypeManager;
 use dnj\AAA\Models\Type;
+use dnj\AAA\Models\TypeAbility;
 use dnj\UserLogger\Contracts\ILogger;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
@@ -58,22 +59,22 @@ class TypeManager implements ITypeManager
     }
 
     public function store(
-        array $localizedDetails,
+        array $translates,
         array $abilities = [],
         array $childIds = [],
         array $meta = [],
         bool $childToItself = false,
         bool $userActivityLog = false,
     ): Type {
-        return DB::transaction(function () use ($localizedDetails, $abilities, $childIds, $meta, $childToItself, $userActivityLog) {
+        return DB::transaction(function () use ($translates, $abilities, $childIds, $meta, $childToItself, $userActivityLog) {
             /**
              * @var Type
              */
             $type = Type::query()->create([
                 'meta' => $meta,
             ]);
-            foreach ($localizedDetails as $lang => $localizedDetail) {
-                $type->translates()->create(['lang' => $lang, ...$localizedDetail]);
+            foreach ($translates as $locale => $fields) {
+                $type->addTranslate($locale, $fields);
             }
             $type->abilities()->createMany(array_map(fn ($name) => ['name' => $name], $abilities));
             foreach ($childIds as $childId) {
@@ -104,9 +105,9 @@ class TypeManager implements ITypeManager
             $type = Type::query()
                 ->lockForUpdate()
                 ->findOrFail(self::getTypeId($type));
-            if (isset($changes['localizedDetails'])) {
-                $type->updateLocalizedDetails($changes['localizedDetails']);
-                unset($changes['localizedDetails']);
+            if (isset($changes['translates'])) {
+                $type->updateTranslates($changes['translates']);
+                unset($changes['translates']);
                 $needToRefresh = true;
             }
             if (isset($changes['abilities'])) {
@@ -175,5 +176,13 @@ class TypeManager implements ITypeManager
         }
 
         return $type->isChildOf($other);
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getAllAbilities(): array
+    {
+        return TypeAbility::query()->toBase()->distinct()->pluck('name')->all();
     }
 }

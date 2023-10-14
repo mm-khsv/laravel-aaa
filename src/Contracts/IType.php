@@ -2,11 +2,11 @@
 
 namespace dnj\AAA\Contracts;
 
-interface IType extends IHasAbilities
+use dnj\Localization\Contracts\ITranslatableModel;
+
+interface IType extends IHasAbilities, ITranslatableModel
 {
     public function getId(): int;
-
-    public function getLocalizedDetails(string $lang): ?ITypeLocalizedDetails;
 
     /**
      * @return string[]

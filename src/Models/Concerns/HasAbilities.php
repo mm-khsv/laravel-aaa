@@ -9,8 +9,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 trait HasAbilities
 {
     /**
-     * @param iterable|string $abilities
-     * @param array|mixed     $arguments
+     * @param array|mixed $arguments
      */
     public function can($ability, $arguments = []): bool
     {

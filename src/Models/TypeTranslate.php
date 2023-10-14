@@ -2,26 +2,28 @@
 
 namespace dnj\AAA\Models;
 
-use dnj\AAA\Contracts\ITypeLocalizedDetails;
-use dnj\AAA\Database\Factories\TypeLocalizedDetailsFactory;
+use dnj\AAA\Contracts\ITypeTranslate;
+use dnj\AAA\Database\Factories\TypeTranslateFactory;
+use dnj\Localization\Eloquent\IsTranslate;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property int    $id
- * @property string $lang
+ * @property string $locale
  * @property int    $type_id
  * @property string $title
  * @property Type   $type
  */
-class TypeLocalizedDetails extends Model implements ITypeLocalizedDetails
+class TypeTranslate extends Model implements ITypeTranslate
 {
     use HasFactory;
+    use IsTranslate;
 
-    public static function newFactory(): TypeLocalizedDetailsFactory
+    public static function newFactory(): TypeTranslateFactory
     {
-        return TypeLocalizedDetailsFactory::new();
+        return TypeTranslateFactory::new();
     }
 
     /**
@@ -29,7 +31,7 @@ class TypeLocalizedDetails extends Model implements ITypeLocalizedDetails
      */
     protected $table = 'aaa_types_translates';
 
-    protected $fillable = ['lang', 'title'];
+    protected $fillable = ['locale', 'title'];
 
     public function type(): BelongsTo
     {
@@ -41,9 +43,9 @@ class TypeLocalizedDetails extends Model implements ITypeLocalizedDetails
         return $this->id;
     }
 
-    public function getLang(): string
+    public function getLocale(): string
     {
-        return $this->lang;
+        return $this->locale;
     }
 
     public function getTypeID(): int

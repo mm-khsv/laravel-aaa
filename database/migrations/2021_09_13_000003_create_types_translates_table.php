@@ -15,10 +15,10 @@ return new class() extends Migration {
                 ->on('aaa_types')
                 ->cascadeOnDelete();
 
-            $table->string('lang', 2);
+            $table->string('locale', 2);
             $table->string('title');
 
-            $table->unique(['lang', 'type_id']);
+            $table->unique(['locale', 'type_id']);
             $table->timestamps();
         });
     }

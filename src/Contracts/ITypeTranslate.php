@@ -2,10 +2,10 @@
 
 namespace dnj\AAA\Contracts;
 
-interface ITypeLocalizedDetails
-{
-    public function getLang(): string;
+use dnj\Localization\Contracts\ITranslateModel;
 
+interface ITypeTranslate extends ITranslateModel
+{
     public function getTypeID(): int;
 
     public function getTitle(): string;
