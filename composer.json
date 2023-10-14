@@ -17,13 +17,17 @@
 	"autoload": {
 		"psr-4": {
 			"dnj\\AAA\\": "src/",
-			"dnj\\AAA\\Database\\Factories\\": "database/factories/"
+			"dnj\\AAA\\Database\\Factories\\": "database/factories/",
+			"dnj\\AAA\\Database\\Seeders\\": "database/seeders/"
 		}
 	},
 	"autoload-dev": {
 		"psr-4": {
 			"dnj\\AAA\\Tests\\": "tests/"
-		}
+		},
+		"classmap": [
+			"database/seeders/DatabaseSeeder.php"
+		]
 	},
 	"scripts": {
 		"test:types": "vendor/bin/phpstan analyze",
@@ -41,5 +45,11 @@
 				"dnj\\AAA\\ServiceProvider"
 			]
 		}
-	}
+	},
+	"repositories": [
+		{
+			"type": "path",
+			"url": "../laravel-localization"
+		}
+	]
 }
