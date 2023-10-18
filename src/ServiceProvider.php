@@ -2,9 +2,11 @@
 
 namespace dnj\AAA;
 
+use dnj\AAA\Contracts\IType;
 use dnj\AAA\Contracts\ITypeManager;
 use dnj\AAA\Contracts\IUser;
 use dnj\AAA\Contracts\IUserManager;
+use dnj\AAA\Policies\TypePolicy;
 use dnj\AAA\Policies\UserPolicy;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -18,6 +20,7 @@ class ServiceProvider extends SupportServiceProvider
      */
     protected $policies = [
         IUser::class => UserPolicy::class,
+        IType::class => TypePolicy::class,
     ];
 
     public function register()

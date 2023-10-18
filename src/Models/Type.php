@@ -3,6 +3,7 @@
 namespace dnj\AAA\Models;
 
 use dnj\AAA\Contracts\IType;
+use dnj\AAA\Contracts\IUser;
 use dnj\AAA\Database\Factories\TypeFactory;
 use dnj\AAA\Models\Concerns\HasAbilities;
 use dnj\Localization\Eloquent\HasTranslate;
@@ -87,6 +88,9 @@ class Type extends Model implements IType
         if (isset($filters['hasFullAccess']) and $filters['hasFullAccess']) {
             $this->scopeHasFullAccess($query);
         }
+        if (isset($filters['userHasAccess']) and $filters['userHasAccess']) {
+            $this->scopeUserHasAccess($query, $filters['userHasAccess']);
+        }
     }
 
     public function scopeHasFullAccess(Builder $query): void
@@ -95,6 +99,23 @@ class Type extends Model implements IType
         $abilitiesCount = TypeAbility::query()->toBase()->distinct()->count('name');
         $query->has('abilities', $abilitiesCount);
         $query->has('children', $typesCount);
+    }
+
+    public function scopeUserHasAccess(Builder $query, IUser $user): void
+    {
+        if ($user instanceof User) {
+            /**
+             * @var IType
+             */
+            $type = $user->type;
+        } else {
+            /**
+             * @var ITypeManager
+             */
+            $typeManager = app(ITypeManager::class);
+            $type = $typeManager->findOrFail($user->getTypeId());
+        }
+        $query->whereIn("id", $type->getChildIds());
     }
 
     /**

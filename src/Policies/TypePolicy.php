@@ -2,25 +2,23 @@
 
 namespace dnj\AAA\Policies;
 
+use dnj\AAA\Contracts\IType;
 use dnj\AAA\Contracts\ITypeManager;
 use dnj\AAA\Contracts\IUser;
 use dnj\AAA\Models\User;
 use dnj\AAA\Policy;
 
-class UserPolicy extends Policy
+class TypePolicy extends Policy
 {
     public function getModel(): string
     {
-        return IUser::class;
+        return IType::class;
     }
 
     protected function userHasAccessToModel(IUser $user, object $model): ?bool
     {
-        if (!$model instanceof IUser) {
-            throw new \Exception('this policy only works with '.IUser::class);
-        }
-        if ($user->getId() == $model->getId()) {
-            return true;
+        if (!$model instanceof IType) {
+            throw new \Exception('this policy only works with '. IType::class);
         }
         if ($user instanceof User) {
             /**
@@ -35,6 +33,6 @@ class UserPolicy extends Policy
             $type = $typeManager->findOrFail($user->getTypeId());
         }
 
-        return in_array($model->getTypeId(), $type->getChildIds());
+        return in_array($model->getId(), $type->getChildIds());
     }
 }
