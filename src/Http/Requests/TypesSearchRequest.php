@@ -6,8 +6,8 @@ use dnj\AAA\Contracts\IType;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * @property int|string|null $id
- * @property string|null $title
+ * @property int|string|null      $id
+ * @property string|null          $title
  * @property bool|string|int|null $has_full_access
  */
 class TypesSearchRequest extends FormRequest

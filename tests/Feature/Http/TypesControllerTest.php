@@ -4,7 +4,6 @@ namespace dnj\AAA\Tests\Feature\Http;
 
 use dnj\AAA\Contracts\IType;
 use dnj\AAA\Contracts\IUser;
-use dnj\AAA\Contracts\UserStatus;
 use dnj\AAA\Models\Type;
 use dnj\AAA\Models\User;
 use dnj\AAA\Tests\TestCase;
@@ -70,16 +69,16 @@ class TypesControllerTest extends TestCase
         $this->actingAs($me);
 
         $data = [
-            'translates' => array(
+            'translates' => [
                 'en' => ['title' => fake('en_US')->jobTitle()],
                 'fa' => ['title' => fake('fa_IR')->jobTitle()],
                 'ar' => ['title' => fake('ar_SA')->jobTitle()],
-            ),
+            ],
             'abilities' => [
-                IType::class . '@viewAny',
-                IType::class . '@view',
-                IType::class . '@store',
-                IType::class . '@update',
+                IType::class.'@viewAny',
+                IType::class.'@view',
+                IType::class.'@store',
+                IType::class.'@update',
             ],
             'child_to_itself' => true,
             'children' => [$me->getTypeId()],
@@ -100,8 +99,8 @@ class TypesControllerTest extends TestCase
                         ],
                     ],
                     'children',
-                    'abilities'
-                ]
+                    'abilities',
+                ],
             ]);
     }
 
@@ -115,15 +114,15 @@ class TypesControllerTest extends TestCase
         $me->type->refresh();
 
         $data = [
-            'translates' => array(
+            'translates' => [
                 'it' => ['title' => fake('it_IT')->jobTitle()],
                 'fa' => ['title' => fake('fa_IR')->jobTitle()],
-            ),
+            ],
             'abilities' => [
-                IUser::class . '@viewAny',
-                IUser::class . '@view',
-                IUser::class . '@store',
-                IUser::class . '@update',
+                IUser::class.'@viewAny',
+                IUser::class.'@view',
+                IUser::class.'@store',
+                IUser::class.'@update',
             ],
             'children' => [$me->getTypeId(), $myChild->getId()],
         ];

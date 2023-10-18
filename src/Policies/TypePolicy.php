@@ -18,7 +18,7 @@ class TypePolicy extends Policy
     protected function userHasAccessToModel(IUser $user, object $model): ?bool
     {
         if (!$model instanceof IType) {
-            throw new \Exception('this policy only works with '. IType::class);
+            throw new \Exception('this policy only works with '.IType::class);
         }
         if ($user instanceof User) {
             /**

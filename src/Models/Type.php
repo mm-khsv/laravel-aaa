@@ -115,7 +115,7 @@ class Type extends Model implements IType
             $typeManager = app(ITypeManager::class);
             $type = $typeManager->findOrFail($user->getTypeId());
         }
-        $query->whereIn("id", $type->getChildIds());
+        $query->whereIn('id', $type->getChildIds());
     }
 
     /**

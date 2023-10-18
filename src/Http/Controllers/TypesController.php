@@ -48,7 +48,6 @@ class TypesController extends Controller
             userActivityLog: true
         );
 
-
         return TypeResource::make($type);
     }
 

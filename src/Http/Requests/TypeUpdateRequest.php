@@ -3,16 +3,13 @@
 namespace dnj\AAA\Http\Requests;
 
 use dnj\AAA\Contracts\ITypeManager;
-use dnj\AAA\Contracts\IUserManager;
-use dnj\AAA\Contracts\UserStatus;
 use dnj\AAA\Rules\AbilityRule;
 use dnj\AAA\Rules\TypeExists;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 /**
- * @property array<array{title?:string}>|null               $translates
- * @property string[]|null                  $abilities
+ * @property array<array{title?:string}>|null $translates
+ * @property string[]|null                    $abilities
  * @property array<string|int>|null           $children
  */
 class TypeUpdateRequest extends FormRequest

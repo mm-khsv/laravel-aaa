@@ -8,10 +8,10 @@ use dnj\AAA\Rules\TypeExists;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * @property array<array{title:string}>               $translates
- * @property string[]                  $abilities
- * @property array<string|int>|null           $children
- * @property string|int|bool $child_to_itself
+ * @property array<array{title:string}> $translates
+ * @property string[]                   $abilities
+ * @property array<string|int>|null     $children
+ * @property string|int|bool            $child_to_itself
  */
 class TypeStoreRequest extends FormRequest
 {
