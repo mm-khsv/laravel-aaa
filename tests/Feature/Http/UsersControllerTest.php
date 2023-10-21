@@ -54,19 +54,20 @@ class UsersControllerTest extends TestCase
         /**
          * @var User $myChild
          */
-        $myChild = User::factory()->withType($myChildType)->create();
-        $this->getUserManager()->ping($myChild);
+        $myFirstChild = User::factory()->withType($myChildType)->create();
+        $mySecondChild = User::factory()->withType($myChildType)->create();
+        $this->getUserManager()->ping($myFirstChild);
 
         $this->actingAs($me);
         $response = $this->getJson(route('users.index').'?'.http_build_query(['online' => true]))->assertOk();
         $this->assertIsArray($response['data']);
-        $this->assertCount(1, $response['data']);
-        $this->assertSame($myChild->id, $response['data'][0]['id']);
+        $this->assertCount(2, $response['data']);
+        $this->assertEqualsCanonicalizing([$me->id, $myFirstChild->id], array_column($response['data'], 'id'));
 
         $response = $this->getJson(route('users.index').'?'.http_build_query(['online' => false]))->assertOk();
         $this->assertIsArray($response['data']);
         $this->assertCount(1, $response['data']);
-        $this->assertSame($me->id, $response['data'][0]['id']);
+        $this->assertSame($mySecondChild->id, $response['data'][0]['id']);
     }
 
     public function testShow(): void
