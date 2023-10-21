@@ -19,8 +19,10 @@ class UserResource extends JsonResource
 
     public function toArray($request)
     {
-        $data = parent::toArray($request);
-        $data['meta'] = $this->exportMeta();
+        $data = array_merge(
+            parent::toArray($request),
+            $this->exportMeta(),
+        );
         if (!$this->summary) {
             $data['type'] = TypeLocalizedResource::make($this->resource->type);
             $data['usernames'] = UsernameResource::collection($this->resource->usernames);
