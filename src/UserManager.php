@@ -10,6 +10,7 @@ use dnj\AAA\Models\User;
 use dnj\AAA\Models\Username;
 use dnj\UserLogger\Contracts\ILogger;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\MultipleRecordsFoundException;
 use Illuminate\Support\Facades\DB;
 
@@ -120,6 +121,17 @@ class UserManager implements IUserManager
 
             return $user;
         });
+    }
+
+    public function ping(int|IUser $user): void
+    {
+        $userId = self::getUserId($user);
+        $rows = User::query()
+            ->where('id', $userId)
+            ->update(['ping_at' => now()]);
+        if (!$rows) {
+            throw (new ModelNotFoundException())->setModel(User::class, [$userId]);
+        }
     }
 
     public function destroy(int|IUser $user, bool $userActivityLog = false): void

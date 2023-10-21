@@ -23,6 +23,7 @@ class UserResource extends JsonResource
             parent::toArray($request),
             $this->exportMeta(),
         );
+        $data['online'] = $this->resource->isOnline();
         if (!$this->summary) {
             $data['type'] = TypeLocalizedResource::make($this->resource->type);
             $data['usernames'] = UsernameResource::collection($this->resource->usernames);

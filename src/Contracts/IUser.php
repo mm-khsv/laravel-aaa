@@ -15,8 +15,16 @@ interface IUser extends IHasAbilities, Authenticatable, Authorizable
 
     public function getStatus(): UserStatus;
 
+    public function isOnline(): bool;
+
     /**
      * @return array<mixed,mixed>
      */
     public function getMeta(): array;
+
+    public function getCreatedAt(): \DateTimeInterface;
+
+    public function getUpdatedAt(): ?\DateTimeInterface;
+
+    public function getPingAt(): ?\DateTimeInterface;
 }

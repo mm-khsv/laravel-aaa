@@ -44,6 +44,31 @@ class UsersControllerTest extends TestCase
         $this->assertNotContains($unknownUser->id, array_column($response['data'], 'id'));
     }
 
+    public function testSearchOnline(): void
+    {
+        $me = $this->createUserWithModelAbility(IUser::class, 'viewAny');
+
+        $myChildType = Type::factory()->create();
+        $myChildType->parents()->attach($me->getTypeId());
+
+        /**
+         * @var User $myChild
+         */
+        $myChild = User::factory()->withType($myChildType)->create();
+        $this->getUserManager()->ping($myChild);
+
+        $this->actingAs($me);
+        $response = $this->getJson(route('users.index').'?'.http_build_query(['online' => true]))->assertOk();
+        $this->assertIsArray($response['data']);
+        $this->assertCount(1, $response['data']);
+        $this->assertSame($myChild->id, $response['data'][0]['id']);
+
+        $response = $this->getJson(route('users.index').'?'.http_build_query(['online' => false]))->assertOk();
+        $this->assertIsArray($response['data']);
+        $this->assertCount(1, $response['data']);
+        $this->assertSame($me->id, $response['data'][0]['id']);
+    }
+
     public function testShow(): void
     {
         $me = $this->createUserWithModelAbility(IUser::class, 'view');

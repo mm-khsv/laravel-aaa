@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 /**
  * @property string               $name
@@ -26,6 +27,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property UserStatus           $status
  * @property Type                 $type
  * @property Collection<Username> $usernames
+ * @property Carbon               $created_at
+ * @property Carbon|null          $updated_at
+ * @property Carbon|null          $ping_at
  */
 class User extends Model implements IUser, Authenticatable, Authorizable
 {
@@ -44,11 +48,17 @@ class User extends Model implements IUser, Authenticatable, Authorizable
         return $value instanceof IUser ? $value->getId() : $value;
     }
 
+    public static function getOnlineTimeWindow(): int
+    {
+        return intval(config('aaa.online-users-time-window'));
+    }
+
     protected ?Username $activeUsername = null;
 
     protected $casts = [
         'status' => UserStatus::class,
         'meta' => 'array',
+        'ping_at' => 'datetime',
     ];
 
     protected $fillable = [
@@ -56,6 +66,7 @@ class User extends Model implements IUser, Authenticatable, Authorizable
         'type_id',
         'meta',
         'status',
+        'ping_at',
     ];
 
     /**
@@ -68,22 +79,35 @@ class User extends Model implements IUser, Authenticatable, Authorizable
         if (isset($filters['id'])) {
             $query->where('id', $filters['id']);
         }
+
         if (isset($filters['name'])) {
             $query->where('name', 'LIKE', $filters['name']);
         }
+
         if (isset($filters['type_id'])) {
             $query->where('type_id', $filters['type_id']);
         }
+
         if (isset($filters['status'])) {
             $query->where('status', $filters['status']);
         }
+
         if (isset($filters['meta'])) {
             foreach ($filters['meta'] as $key => $value) {
                 $query->where("meta->{$key}", $value);
             }
         }
+
         if (isset($filters['userHasAccess'])) {
             $this->scopeUserHasAccess($query, $filters['userHasAccess']);
+        }
+
+        if (isset($filters['online'])) {
+            if ($filters['online']) {
+                $this->scopeAreOnline($query);
+            } else {
+                $this->scopeAreNotOnline($query);
+            }
         }
     }
 
@@ -114,6 +138,19 @@ class User extends Model implements IUser, Authenticatable, Authorizable
         } else {
             $query->where('id', $user->getId());
         }
+    }
+
+    public function scopeAreOnline(Builder $query): void
+    {
+        $query->where('ping_at', '>=', now()->subSeconds($this->getOnlineTimeWindow()));
+    }
+
+    public function scopeAreNotOnline(Builder $query): void
+    {
+        $query->where(function (Builder $q) {
+            $q->where('ping_at', '<', now()->subSeconds($this->getOnlineTimeWindow()));
+            $q->orWhereNull('ping_at');
+        });
     }
 
     public function setActiveUsername(?Username $activeUsername): void
@@ -159,6 +196,26 @@ class User extends Model implements IUser, Authenticatable, Authorizable
     public function getMeta(): array
     {
         return $this->meta ?? [];
+    }
+
+    public function isOnline(): bool
+    {
+        return null !== $this->ping_at and $this->ping_at->isAfter(now()->subSeconds($this->getOnlineTimeWindow()));
+    }
+
+    public function getCreatedAt(): Carbon
+    {
+        return $this->created_at;
+    }
+
+    public function getUpdatedAt(): ?Carbon
+    {
+        return $this->updated_at;
+    }
+
+    public function getPingAt(): ?Carbon
+    {
+        return $this->ping_at;
     }
 
     /**

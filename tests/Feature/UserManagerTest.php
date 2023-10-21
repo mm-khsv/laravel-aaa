@@ -37,6 +37,9 @@ class UserManagerTest extends TestCase
         $this->assertTrue($user->usernames[0]->verifyPassword('123'));
         $this->assertFalse($user->usernames[0]->verifyPassword('1234'));
         $this->assertEqualsCanonicalizing($type->getAbilities(), $user->getAbilities());
+        $this->assertNotNull($user->getCreatedAt());
+        $this->assertNotNull($user->getUpdatedAt());
+        $this->assertNull($user->getPingAt());
     }
 
     public function testStoreDuplicateUsername(): void
@@ -112,5 +115,32 @@ class UserManagerTest extends TestCase
 
         $this->expectException(ModelNotFoundException::class);
         $this->getUserManager()->findByUsernameOrFail('@@');
+    }
+
+    public function testPing(): void
+    {
+        $user1 = User::factory()->create();
+        $user2 = User::factory()->create();
+        $this->assertFalse($user1->isOnline());
+        $this->assertFalse($user2->isOnline());
+        $this->getUserManager()->ping($user1);
+        $user1->refresh();
+        $user2->refresh();
+        $this->assertTrue($user1->isOnline());
+        $this->assertFalse($user2->isOnline());
+
+        $users = $this->getUserManager()->search(['online' => true]);
+        $this->assertCount(1, $users);
+        $this->assertSame($user1->getId(), $users[0]->getId());
+
+        $users = $this->getUserManager()->search(['online' => false]);
+        $this->assertCount(1, $users);
+        $this->assertSame($user2->getId(), $users[0]->getId());
+    }
+
+    public function testPingInvalidUser(): void
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->getUserManager()->ping(0);
     }
 }

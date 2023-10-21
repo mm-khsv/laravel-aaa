@@ -7,4 +7,5 @@ return [
         'enable' => true,
         'prefix' => 'api/aaa',
     ],
+    'online-users-time-window' => 30, // seconds
 ];

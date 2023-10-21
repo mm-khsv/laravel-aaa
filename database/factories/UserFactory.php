@@ -21,6 +21,7 @@ class UserFactory extends Factory
             'type_id' => Type::factory(),
             'meta' => ['key' => 'value'],
             'status' => UserStatus::ACTIVE,
+            'ping_at' => null,
         ];
     }
 
@@ -52,6 +53,13 @@ class UserFactory extends Factory
     {
         return $this->state(fn () => [
             'meta' => $meta,
+        ]);
+    }
+
+    public function isOnline(): static
+    {
+        return $this->state(fn () => [
+            'ping_at' => now(),
         ]);
     }
 }

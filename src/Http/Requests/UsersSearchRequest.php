@@ -23,6 +23,7 @@ class UsersSearchRequest extends FormRequest
             'type_id' => ['sometimes', 'required', app(TypeExists::class)->userHasAccess($this->user())],
             'status' => ['sometimes', 'required', Rule::enum(UserStatus::class)],
             'username' => ['sometimes', 'required', 'string'],
+            'online' => ['sometimes', 'required', 'boolean'],
         ];
     }
 }
