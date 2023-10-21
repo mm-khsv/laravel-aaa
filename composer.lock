@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "dnj/laravel-localization",
-            "version": "v1.0.0",
+            "version": "v1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dnj/laravel-localization.git",
-                "reference": "2db96a2291cf005795ccb0d47ce257e787896fa7"
+                "reference": "9cbd8b7c3539f12f3c92848d4f52d03283de1299"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dnj/laravel-localization/zipball/2db96a2291cf005795ccb0d47ce257e787896fa7",
-                "reference": "2db96a2291cf005795ccb0d47ce257e787896fa7",
+                "url": "https://api.github.com/repos/dnj/laravel-localization/zipball/9cbd8b7c3539f12f3c92848d4f52d03283de1299",
+                "reference": "9cbd8b7c3539f12f3c92848d4f52d03283de1299",
                 "shasum": ""
             },
             "require": {
@@ -41,9 +41,9 @@
             ],
             "support": {
                 "issues": "https://github.com/dnj/laravel-localization/issues",
-                "source": "https://github.com/dnj/laravel-localization/tree/v1.0.0"
+                "source": "https://github.com/dnj/laravel-localization/tree/v1.0.1"
             },
-            "time": "2023-10-14T12:23:35+00:00"
+            "time": "2023-10-21T18:20:56+00:00"
         },
         {
             "name": "dnj/laravel-user-logger",

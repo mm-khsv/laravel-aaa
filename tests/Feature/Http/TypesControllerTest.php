@@ -127,7 +127,10 @@ class TypesControllerTest extends TestCase
             'children' => [$me->getTypeId(), $myChild->getId()],
         ];
         $this->putJson(route('types.update', ['type' => $myChild->getId()]), $data)
-            ->assertOk();
+            ->assertOk()
+            ->assertJson([
+                'data' => array_merge(['id' => $myChild->getId()], $data),
+            ]);
     }
 
     public function testDestroy(): void

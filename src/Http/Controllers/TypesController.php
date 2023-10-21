@@ -66,9 +66,9 @@ class TypesController extends Controller
         $this->authorize('update', $type);
 
         $changes = $data;
-        if (isset($data['children'])) {
-            $data['childIds'] = $data['children'];
-            unset($data['children']);
+        if (isset($changes['children'])) {
+            $changes['childIds'] = $changes['children'];
+            unset($changes['children']);
         }
         $user = $this->typeManager->update(
             type: $type,
