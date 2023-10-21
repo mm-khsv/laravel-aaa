@@ -129,13 +129,20 @@ class UserManagerTest extends TestCase
         $this->assertTrue($user1->isOnline());
         $this->assertFalse($user2->isOnline());
 
+        $count = $this->getUserManager()->count();
+        $this->assertSame(2, $count);
+
         $users = $this->getUserManager()->search(['online' => true]);
         $this->assertCount(1, $users);
         $this->assertSame($user1->getId(), $users[0]->getId());
+        $count = $this->getUserManager()->count(['online' => true]);
+        $this->assertSame(1, $count);
 
         $users = $this->getUserManager()->search(['online' => false]);
         $this->assertCount(1, $users);
         $this->assertSame($user2->getId(), $users[0]->getId());
+        $count = $this->getUserManager()->count(['online' => false]);
+        $this->assertSame(1, $count);
     }
 
     public function testPingInvalidUser(): void

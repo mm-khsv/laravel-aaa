@@ -77,7 +77,10 @@ class User extends Model implements IUser, Authenticatable, Authorizable
     public function scopeFilter(Builder $query, array $filters): void
     {
         if (isset($filters['id'])) {
-            $query->where('id', $filters['id']);
+            if (!is_array($filters['id'])) {
+                $filters['id'] = [$filters['id']];
+            }
+            $query->whereIn('id', $filters['id']);
         }
 
         if (isset($filters['name'])) {

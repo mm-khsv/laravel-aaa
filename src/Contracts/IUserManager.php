@@ -13,11 +13,16 @@ interface IUserManager
     public function findByUsernameOrFail(string $username): IUser;
 
     /**
-     * @param array{ids?:[],type?:array<IType|int>|IType|int,name?:string,username?:string,online?:bool} $filters
+     * @param array{id?:int[]|int,type?:array<IType|int>|IType|int,name?:string,username?:string,online?:bool,userHasAccess?:int|IUser} $filters
      *
      * @return iterable<IUser>
      */
     public function search(array $filters = []): iterable;
+
+    /**
+     * @param array{id?:int[]|int,type?:array<IType|int>|IType|int,name?:string,username?:string,online?:bool,userHasAccess?:int|IUser} $filters
+     */
+    public function count(array $filters = []): int;
 
     /**
      * @param array<mixed,mixed> $meta

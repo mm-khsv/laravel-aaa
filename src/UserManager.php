@@ -54,7 +54,16 @@ class UserManager implements IUserManager
      */
     public function search(array $filters = []): Collection
     {
-        return User::query()->filter($filters)->get();
+        return User::query()
+            ->filter($filters)
+            ->get();
+    }
+
+    public function count(array $filters = []): int
+    {
+        return User::query()
+            ->filter($filters)
+            ->count();
     }
 
     public function store(string $name, string $username, string $password, int|IType $type, array $meta = [], bool $userActivityLog = false): User
