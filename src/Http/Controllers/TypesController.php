@@ -35,7 +35,7 @@ class TypesController extends Controller
             ->userHasAccess(Auth::user())
             ->cursorPaginate();
 
-        return TypeCollection::make($types, true);
+        return TypeCollection::make($types);
     }
 
     public function store(TypeStoreRequest $request): TypeResource

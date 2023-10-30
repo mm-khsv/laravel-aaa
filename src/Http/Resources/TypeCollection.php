@@ -4,15 +4,19 @@ namespace dnj\AAA\Http\Resources;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
+/**
+ * @property \Illuminate\Support\Collection<TypeResource> $resource
+ */
 class TypeCollection extends ResourceCollection
 {
-    public $collects = TypeLocalizedResource::class;
+    public $collects = TypeResource::class;
 
-    public function __construct($resource, bool $localized = true)
+    public function __construct($resource, bool $localized = true, bool $summary = true)
     {
-        if (!$localized) {
-            $this->collects = TypeResource::class;
-        }
         parent::__construct($resource);
+        
+        $this->resource
+            ->each(fn($i) => $i->localized($localized))
+            ->each(fn($i) => $i->summarize($summary));
     }
 }

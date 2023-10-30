@@ -25,7 +25,7 @@ class UserResource extends JsonResource
         );
         $data['online'] = $this->resource->isOnline();
         if (!$this->summary) {
-            $data['type'] = TypeLocalizedResource::make($this->resource->type);
+            $data['type'] = TypeResource::make($this->resource->type)->localized()->summarize();
             $data['usernames'] = UsernameResource::collection($this->resource->usernames);
         }
 

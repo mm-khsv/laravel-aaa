@@ -29,7 +29,7 @@ class UserCollection extends ResourceCollection
          */
         $typeManager = app(ITypeManager::class);
         $types = iterator_to_array($typeManager->search(['id' => $types]));
-        $types = array_map(fn (IType $t) => new TypeLocalizedResource($t), $types);
+        $types = array_map(fn (IType $t) => TypeResource::make($t)->localized()->summarize(), $types);
         $default['types'] = $types;
 
         return $default;
