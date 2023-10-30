@@ -7,6 +7,7 @@ use dnj\AAA\Contracts\UserStatus;
 use dnj\AAA\Rules\TypeExists;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Yeganemehr\LaravelSupport\Http\Requests\HasExtraRules;
 
 /**
  * @property string               $name
@@ -16,12 +17,14 @@ use Illuminate\Validation\Rule;
  */
 class UserStoreRequest extends FormRequest
 {
+    use HasExtraRules;
+
     public function authorize(): bool
     {
         return $this->user()->can('store', IUser::class);
     }
 
-    public function rules(): array
+    public function defaultRules(): array
     {
         return [
             'name' => ['required', 'string'],

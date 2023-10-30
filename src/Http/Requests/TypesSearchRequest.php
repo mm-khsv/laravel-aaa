@@ -4,6 +4,7 @@ namespace dnj\AAA\Http\Requests;
 
 use dnj\AAA\Contracts\IType;
 use Illuminate\Foundation\Http\FormRequest;
+use Yeganemehr\LaravelSupport\Http\Requests\HasExtraRules;
 
 /**
  * @property int|string|null      $id
@@ -12,12 +13,14 @@ use Illuminate\Foundation\Http\FormRequest;
  */
 class TypesSearchRequest extends FormRequest
 {
+    use HasExtraRules;
+
     public function authorize(): bool
     {
         return $this->user()->can('viewAny', IType::class);
     }
 
-    public function rules(): array
+    public function defaultRules(): array
     {
         return [
             'id' => ['sometimes', 'required', 'numeric'],

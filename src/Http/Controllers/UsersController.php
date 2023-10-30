@@ -71,7 +71,7 @@ class UsersController extends Controller
     public function update(int $user, UserUpdateRequest $request)
     {
         $data = $request->validated();
-        $user = $this->userManager->findOrFail($user);
+        $user = $request->getTheUser();
         $this->authorize('update', $user);
 
         $changes = $data;

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a753cadfda9f81bc4d38b905e6e7b7ae",
+    "content-hash": "fd3cd3b45c74adbe37d0e99e965c8cc2",
     "packages": [
         {
             "name": "dnj/laravel-localization",
@@ -89,6 +89,45 @@
                 "source": "https://github.com/dnj/laravel-user-logger/tree/v1.0.0"
             },
             "time": "2023-01-03T10:34:23+00:00"
+        },
+        {
+            "name": "yeganemehr/laravel-support",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/yeganemehr/laravel-support.git",
+                "reference": "8c3eacea1b62839c137c98a4f4adfe80bb9d5c8c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/yeganemehr/laravel-support/zipball/8c3eacea1b62839c137c98a4f4adfe80bb9d5c8c",
+                "reference": "8c3eacea1b62839c137c98a4f4adfe80bb9d5c8c",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.1"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.37.1",
+                "orchestra/testbench": "^8.0",
+                "phpstan/phpstan": "^1.10.39",
+                "phpunit/phpunit": "^9.6.13"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Yeganemehr\\LaravelSupport\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "support": {
+                "issues": "https://github.com/yeganemehr/laravel-support/issues",
+                "source": "https://github.com/yeganemehr/laravel-support/tree/v1.0.0"
+            },
+            "time": "2023-10-30T14:16:06+00:00"
         }
     ],
     "packages-dev": [

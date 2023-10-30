@@ -2,10 +2,12 @@
 
 namespace dnj\AAA\Http\Requests;
 
+use dnj\AAA\Contracts\IType;
 use dnj\AAA\Contracts\ITypeManager;
 use dnj\AAA\Rules\AbilityRule;
 use dnj\AAA\Rules\TypeExists;
 use Illuminate\Foundation\Http\FormRequest;
+use Yeganemehr\LaravelSupport\Http\Requests\HasExtraRules;
 
 /**
  * @property array<array{title?:string}>|null $translates
@@ -14,14 +16,19 @@ use Illuminate\Foundation\Http\FormRequest;
  */
 class TypeUpdateRequest extends FormRequest
 {
-    public function authorize(): bool
-    {
-        $type = app(ITypeManager::class)->findOrFail($this->route('type'));
+    use HasExtraRules;
 
-        return $this->user()->can('update', $type);
+    public function getType(): IType
+    {
+        return app(ITypeManager::class)->findOrFail($this->route('type'));
     }
 
-    public function rules(): array
+    public function authorize(): bool
+    {
+        return $this->user()->can('update', $this->getType());
+    }
+
+    public function defaultRules(): array
     {
         return [
             'translates.*.title' => ['sometimes', 'required', 'string'],

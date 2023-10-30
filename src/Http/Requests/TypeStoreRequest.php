@@ -6,6 +6,7 @@ use dnj\AAA\Contracts\IType;
 use dnj\AAA\Rules\AbilityRule;
 use dnj\AAA\Rules\TypeExists;
 use Illuminate\Foundation\Http\FormRequest;
+use Yeganemehr\LaravelSupport\Http\Requests\HasExtraRules;
 
 /**
  * @property array<array{title:string}> $translates
@@ -15,12 +16,15 @@ use Illuminate\Foundation\Http\FormRequest;
  */
 class TypeStoreRequest extends FormRequest
 {
+
+    use HasExtraRules;
+
     public function authorize(): bool
     {
         return $this->user()->can('store', IType::class);
     }
 
-    public function rules(): array
+    public function defaultRules(): array
     {
         return [
             'translates.*.title' => ['required', 'string'],

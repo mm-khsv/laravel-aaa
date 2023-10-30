@@ -7,15 +7,18 @@ use dnj\AAA\Contracts\UserStatus;
 use dnj\AAA\Rules\TypeExists;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Yeganemehr\LaravelSupport\Http\Requests\HasExtraRules;
 
 class UsersSearchRequest extends FormRequest
 {
+    use HasExtraRules;
+
     public function authorize(): bool
     {
         return $this->user()->can('viewAny', IUser::class);
     }
 
-    public function rules(): array
+    public function defaultRules(): array
     {
         return [
             'id' => ['sometimes', 'required', 'numeric'],

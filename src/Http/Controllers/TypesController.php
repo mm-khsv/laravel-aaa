@@ -62,7 +62,7 @@ class TypesController extends Controller
     public function update(int $type, TypeUpdateRequest $request): TypeResource
     {
         $data = $request->validated();
-        $type = $this->typeManager->findOrFail($type);
+        $type = $request->getType();
         $this->authorize('update', $type);
 
         $changes = $data;

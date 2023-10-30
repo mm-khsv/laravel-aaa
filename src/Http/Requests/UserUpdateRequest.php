@@ -2,11 +2,13 @@
 
 namespace dnj\AAA\Http\Requests;
 
+use dnj\AAA\Contracts\IUser;
 use dnj\AAA\Contracts\IUserManager;
 use dnj\AAA\Contracts\UserStatus;
 use dnj\AAA\Rules\TypeExists;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Yeganemehr\LaravelSupport\Http\Requests\HasExtraRules;
 
 /**
  * @property string|null     $name
@@ -15,14 +17,19 @@ use Illuminate\Validation\Rule;
  */
 class UserUpdateRequest extends FormRequest
 {
-    public function authorize(): bool
-    {
-        $user = app(IUserManager::class)->findOrFail($this->route('user'));
+    use HasExtraRules;
 
-        return $this->user()->can('update', $user);
+    public function getTheUser(): IUser
+    {
+        return app(IUserManager::class)->findOrFail($this->route('user'));
     }
 
-    public function rules(): array
+    public function authorize(): bool
+    {
+        return $this->user()->can('update', $this->getTheUser());
+    }
+
+    public function defaultRules(): array
     {
         return [
             'name' => ['sometimes', 'required', 'string'],
