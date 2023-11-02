@@ -57,6 +57,10 @@ abstract class Policy
             return Response::allow();
         }
 
+        if (str_ends_with($ability, '@viewAnonymous')) {
+            return Response::allow();
+        }
+
         return $this->userHasAccessToModel($user, $model) ? Response::allow() : $this->denyResponse($ability);
     }
 
