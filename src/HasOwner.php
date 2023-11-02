@@ -6,10 +6,10 @@ use dnj\AAA\Contracts\ITypeManager;
 use dnj\AAA\Contracts\IUser;
 use dnj\AAA\Contracts\IUserManager;
 use dnj\AAA\Models\User;
+use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\DB;
 
 trait HasOwner
 {
@@ -48,15 +48,19 @@ trait HasOwner
         $childIds = $type->getChildIds();
 
         if ($childIds) {
-            $query->where(function ($query) use ($user, $childIds) {
+            $accessToAnonymous = app(Gate::class)->forUser($user)->check('viewAnonymous', $this);
+            $query->where(function ($query) use ($user, $childIds, $accessToAnonymous) {
                 $userTable = $user->getTable();
-                $query->whereExists(function ($query) use ($userTable, $childIds) {
-                    $query->select(DB::raw(1))
+                $userKeyName = $user->getKeyName();
+                $query->whereIn($this->getOwnerUserColumn(), function ($query) use ($userKeyName, $userTable, $childIds) {
+                    $query->select($userKeyName)
                         ->from($userTable)
-                        ->whereColumn($this->getTable().'.'.$this->getOwnerUserColumn(), "{$userTable}.id")
                         ->whereIn("{$userTable}.type_id", $childIds);
                 });
                 $query->orWhere($this->getOwnerUserColumn(), $user->getId());
+                if ($accessToAnonymous) {
+                    $query->orWhereNull($this->getOwnerUserColumn());
+                }
             });
         } else {
             $query->where($this->getOwnerUserColumn(), $user->getId());
@@ -65,6 +69,19 @@ trait HasOwner
 
     public function hasUserAccess(int|IUser $user): bool
     {
+        if (null === $this->getOwnerUserId()) {
+            if (is_int($user)) {
+                /**
+                 * @var IUserManager
+                 */
+                $userManager = app(IUserManager::class);
+                $user = $userManager->findOrFail($user);
+            }
+
+            $accessToAnonymous = app(Gate::class)->forUser($user)->check('viewAnonymous', $this);
+
+            return $accessToAnonymous;
+        }
         if (User::ensureId($user) == $this->getOwnerUserId()) {
             return true;
         }
