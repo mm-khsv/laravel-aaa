@@ -10,7 +10,6 @@ use dnj\AAA\Models\User;
 use dnj\AAA\Models\Username;
 use dnj\UserLogger\Contracts\ILogger;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\MultipleRecordsFoundException;
 use Illuminate\Support\Facades\DB;
 
@@ -107,7 +106,7 @@ class UserManager implements IUserManager
              */
             $user = User::query()
                 ->lockForUpdate()
-                ->findOrFail(self::getUserId($user));
+                ->findOrFail(User::ensureId($user));
             if (isset($changes['type'])) {
                 $changes['type_id'] = TypeManager::getTypeId($changes['type']);
                 unset($changes['type']);
@@ -134,13 +133,13 @@ class UserManager implements IUserManager
 
     public function ping(int|IUser $user): void
     {
-        $userId = self::getUserId($user);
-        $rows = User::query()
-            ->where('id', $userId)
-            ->update(['ping_at' => now()]);
-        if (!$rows) {
-            throw (new ModelNotFoundException())->setModel(User::class, [$userId]);
-        }
+        $user = User::ensureId($user);
+        DB::transaction(function () use ($user) {
+            $user = User::query()
+                ->lockForUpdate()
+                ->findOrFail($user);
+            $user->update(['ping_at' => now()]);
+        });
     }
 
     public function destroy(int|IUser $user, bool $userActivityLog = false): void
@@ -151,7 +150,7 @@ class UserManager implements IUserManager
              */
             $user = User::query()
                 ->lockForUpdate()
-                ->findOrFail(self::getUserId($user));
+                ->findOrFail(User::ensureId($user));
             $user->delete();
 
             if ($userActivityLog) {
