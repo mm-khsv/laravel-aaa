@@ -25,20 +25,25 @@ class TypeResource extends JsonResource
             $this->exportChildren(),
             ['abilities' => $this->resource->getAbilities()],
         );
+
         return $data;
     }
 
-    protected function exportChildren(): array {
+    public function localized(bool $localized = true): static
+    {
+        $this->localized = $localized;
+
+        return $this;
+    }
+
+    protected function exportChildren(): array
+    {
         if ($this->summary) {
             return ['children' => $this->resource->getChildIds()];
         }
-        return [
-            'children' => TypeCollection::make($this->resource->children, true, true)
-        ];
-    }
 
-    public function localized(bool $localized = true): static {
-        $this->localized = $localized;
-        return $this;
+        return [
+            'children' => TypeCollection::make($this->resource->children, true, true),
+        ];
     }
 }

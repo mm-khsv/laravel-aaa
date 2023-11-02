@@ -97,11 +97,11 @@ class TypesControllerTest extends TestCase
                             'locale',
                             'title',
                         ],
-                    ], 
+                    ],
                     'children' => [
                         '*' => [
                             'id',
-                        ]
+                        ],
                     ],
                     'abilities',
                 ],
@@ -133,16 +133,16 @@ class TypesControllerTest extends TestCase
         $this->putJson(route('types.update', ['type' => $myChild->getId()]), $data)
             ->assertOk()
             ->assertJson([
-                'data' => array_merge(['id' => $myChild->getId()], $data, array(
+                'data' => array_merge(['id' => $myChild->getId()], $data, [
                     'children' => [
-                        array(
+                        [
                             'id' => $me->getTypeId(),
-                        ),
-                        array(
+                        ],
+                        [
                             'id' => $myChild->getId(),
-                        ),
-                    ]
-                )),
+                        ],
+                    ],
+                ]),
             ]);
     }
 

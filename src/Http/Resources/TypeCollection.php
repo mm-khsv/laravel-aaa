@@ -14,9 +14,9 @@ class TypeCollection extends ResourceCollection
     public function __construct($resource, bool $localized = true, bool $summary = true)
     {
         parent::__construct($resource);
-        
+
         $this->resource
-            ->each(fn($i) => $i->localized($localized))
-            ->each(fn($i) => $i->summarize($summary));
+            ->each(fn ($i) => $i->localized($localized))
+            ->each(fn ($i) => $i->summarize($summary));
     }
 }

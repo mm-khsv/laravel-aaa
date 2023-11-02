@@ -16,7 +16,6 @@ use Yeganemehr\LaravelSupport\Http\Requests\HasExtraRules;
  */
 class TypeStoreRequest extends FormRequest
 {
-
     use HasExtraRules;
 
     public function authorize(): bool
