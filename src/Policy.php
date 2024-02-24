@@ -61,17 +61,17 @@ abstract class Policy
             return Response::allow();
         }
 
-        return $this->userHasAccessToModel($user, $model) !== false ? Response::allow() : $this->denyResponse($ability);
+        return $this->userHasAccessToModel($user, $model) ? Response::allow() : $this->denyResponse($ability);
     }
 
     protected function userHasAccessToModel(IUser $user, object $model): ?bool
     {
         if (!$model instanceof IOwnerableModel) {
-            return null;
+            return true;
         }
         $ownerId = $model->getOwnerUserId();
         if (null === $ownerId) {
-            return null;
+            return false;
         }
         if ($user->getId() == $ownerId) {
             return true;
