@@ -31,7 +31,7 @@ class UsersController extends Controller
         $users = User::query()
             ->filter($request->validated())
             ->userHasAccess(Auth::user())
-            ->cursorPaginate();
+            ->cursorPaginate($request->ipp);
 
         return UserCollection::make($users, true);
     }

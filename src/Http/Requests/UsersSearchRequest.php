@@ -27,6 +27,7 @@ class UsersSearchRequest extends FormRequest
             'status' => ['sometimes', 'required', Rule::enum(UserStatus::class)],
             'username' => ['sometimes', 'required', 'string'],
             'online' => ['sometimes', 'required', 'boolean'],
+            ['ipp'] => ['sometimes', 'required', 'integer', 'min:1'],
         ];
     }
 }
