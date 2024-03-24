@@ -19,8 +19,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
-use Laravel\Sanctum\HasApiTokens;
-
 
 /**
  * @property string               $name
@@ -35,7 +33,6 @@ use Laravel\Sanctum\HasApiTokens;
  */
 class User extends Model implements IUser, Authenticatable, Authorizable
 {
-    use HasApiTokens;
     use HasAbilities;
     use HasDynamicFields;
     use Loggable;
